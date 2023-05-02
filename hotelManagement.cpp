@@ -432,20 +432,124 @@ public:
         getch();
     }
 
+    void changeStatus(string rmNo, int type, string stat)
+    {
+        if (type == 1)
+        {
+            // read mood
+            fstream vip;
+            vip.open("viproom.txt", ios::in);
+            // write mood
+            fstream viptemp;
+            viptemp.open("viptemp.txt", ios::out);
+
+            while (vip >> roomNo >> bedNum >> ac >> rent >> status)
+            {
+                if (rmNo == roomNo)
+                {
+
+                    status = stat;
+                    viptemp << roomNo << " " << bedNum << " " << ac << " " << rent << " " << status << endl;
+                }
+                else
+                {
+                    viptemp << roomNo << " " << bedNum << " " << ac << " " << rent << " " << status << endl;
+                }
+            }
+            copyvip();
+        }
+
+        else
+        {
+            // read mood
+            fstream normal;
+            normal.open("normalroom.txt", ios::in);
+            // write mood
+            fstream normaltemp;
+            normaltemp.open("normaltemp.txt", ios::out);
+
+            while (normal >> roomNo >> bedNum >> ac >> rent >> status)
+            {
+                if (rmNo == roomNo)
+                {
+                    status = stat;
+                    normaltemp << roomNo << " " << bedNum << " " << ac << " " << rent << " " << status << endl;
+                }
+                else
+                {
+                    normaltemp << roomNo << " " << bedNum << " " << ac << " " << rent << " " << status << endl;
+                }
+            }
+            copynormal();
+        }
+    }
+    // return 1 for available
+    // return 0 for not available
+    // return -1 for not found
+    int checkStatus(string rmNo, int type)
+    {
+        if (type == 1)
+        {
+            // read mood
+            fstream vip;
+            vip.open("viproom.txt", ios::in);
+
+            while (vip >> roomNo >> bedNum >> ac >> rent >> status)
+            {
+                if (rmNo == roomNo)
+                {
+
+                    if (status == "0")
+                        return 0;
+                    else
+                        return 1;
+                }
+            }
+            return 1;
+        }
+
+        else
+        {
+            // read mood
+            fstream normal;
+            normal.open("normalroom.txt", ios::in);
+            
+            while (normal >> roomNo >> bedNum >> ac >> rent >> status)
+            {
+                if (rmNo == roomNo)
+                {
+
+                    if (status == "0")
+                        return 0;
+                    else
+                        return 1;
+                }
+            }
+            return 1;
+        }
+    }
     void checkIn()
     {
         system("cls");
         cout << "1.VIP Room" << endl;
         cout << "2.Normal Room" << endl;
+        cout<<"3.Back"<<endl;
         cout << "Enter your Choice:";
         int choice;
         cin >> choice;
+        if(choice==3)
+            return;
+        
         string rm;
-        string name, vill, post, ps, dist, phn, days;
         cout << "Room No :";
         cin >> rm;
+       
+        string name, vill, post, ps, dist, phn, days;
+        if(checkStatus(rm,choice)==1)
+            cout<<"This room is not available"<<endl;
+        // else if(checkStatus(rm,choice)==-1)
 
-        if (choice == 1)
+       else if (choice == 1)
         {
             cout << "Name:";
             getchar();
@@ -476,7 +580,7 @@ public:
             ofstream fout;
             fout.open(uname.c_str());
             fout << "Room No: " << rm << endl;
-            fout << "Room Type: VIP" <<endl;
+            fout << "Room Type: VIP" << endl;
             fout << "Name: " << name << endl;
             fout << "Village: " << vill << endl;
             fout << "Post.: " << post << endl;
@@ -484,13 +588,11 @@ public:
             fout << "Dist.: " << dist << endl;
             fout << "Mobile: " << phn << endl;
             fout << "Number of days: " << days << endl;
-            fout << "Date: " << dt << endl;
+            fout << "Check In: " << dt << endl;
             cout << "Check In Successful." << endl;
-            getch();
 
-
-
-
+            changeStatus(rm, 1, "1");
+            // getch();
         }
         else if (choice == 2)
         {
@@ -523,7 +625,7 @@ public:
             ofstream fout;
             fout.open(uname.c_str());
             fout << "Room No: " << rm << endl;
-            fout << "Room Type: Normal" <<endl;
+            fout << "Room Type: Normal" << endl;
             fout << "Name: " << name << endl;
             fout << "Village: " << vill << endl;
             fout << "Post.: " << post << endl;
@@ -533,14 +635,21 @@ public:
             fout << "Number of days: " << days << endl;
             fout << "Check In: " << dt << endl;
             cout << "Check In Successful." << endl;
-            getch();
+
+            changeStatus(rm, 2, "1");
+
+            // getch();
         }
+        // else if(choice == 3)
+        //     customermenu();
         else
         {
             cout << "Your have a wrong choice. Press a key to try again.";
-            getch();
-            checkIn();
+            // getch();
+            // checkIn();
         }
+        getch();
+        // return ;
     }
     void checkout()
     {
@@ -549,14 +658,19 @@ public:
         getchar();
         cout << "Please Enter your Name:";
         getline(cin, name);
-        
+
         // cout<<name<<endl;
         // ifstream vip("viproom.txt", ios::app);
         string uname = name + ".txt";
         ifstream CustomerDetails(uname, ios::in);
         string line;
-        while(getline(CustomerDetails,line)){
-            cout<<line<<endl;
+        int i=0;
+
+        while (getline(CustomerDetails, line))
+        {
+            // if(i>0)
+            cout << line << endl;
+            // i++;
         }
         cout << "Please Enter your Room No to confirm check out:";
         string rmN;
@@ -565,34 +679,11 @@ public:
         int roomtype;
         cin >> roomtype;
 
-
-        // if(roomtype==1111)
-        // {
-        //     ifstream vip("viproom.txt", ios::app);
-        //     while (vip >> roomNo >> bedNum >> ac >> rent >> status)
-        //     {
-        //         if (status == "1" && roomNo==rmN )
-        //         {
-
-        //         }
-        //     }
-
-        // }
-        // else if(roomtype==2222)
-        // {
-        //     ifstream normal("normalroom.txt", ios::app);
-        //     while (normal >> roomNo >> bedNum >> ac >> rent >> status)
-        //     {
-        //         if (status == "0")
-        //             cout << "   " << roomNo << "\t         " << bedNum << "\t        " << ac << "\t      " << rent << "\t     "
-        //                  << "Available" << endl;
-        //     }
-
-        // }
-
+        changeStatus(rmN, roomtype, "0");
 
         cout << "Check Out Successful." << endl;
         getch();
+        // return ;
     }
 };
 
